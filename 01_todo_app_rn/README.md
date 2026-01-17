@@ -10,10 +10,10 @@ This project represents my **first step into mobile development**, coming from a
 * [Features](#-features)
 * [What I Learned](#-what-i-learned)
 * [How to Use the App](#-how-to-use-the-app)
-* [Run Locally](#-run-locally)
+* [Run Locally](#️-run-locally)
 * [Backend Setup (Convex)](#-backend-setup-convex)
 * [Build APK](#-build-apk)
-* [Download APK](#-download-apk)
+* [Download APK](#️-download-apk)
 
 ---
 

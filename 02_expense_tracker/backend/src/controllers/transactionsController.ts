@@ -6,7 +6,7 @@ export async function getTransactionsByUserId(req: Request, res: Response) {
     const { userId } = req.params;
     // get transaction from db and send in response
     const transactions = await sql`
-    SELECT * FROM transaction WHERE user_id = ${userId} ORDER BY created_at DESC
+    SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC
     `;
     return res.status(200).json({ transactions });
   } catch (error) {
@@ -65,16 +65,16 @@ export async function getSummaryByUserId(req: Request, res: Response) {
     const { userId } = req.params;
 
     const balanceResult = await sql`
-    SELECT COALESCE(SUM(amount),0) as balance FROM transaction WHERE user_id = ${userId}
+    SELECT COALESCE(SUM(amount),0) as balance FROM transactions WHERE user_id = ${userId}
     `;
 
     const incomeResult = await sql`
-    SELECT COALESCE(SUM(amount),0) as income FROM transaction
+    SELECT COALESCE(SUM(amount),0) as income FROM transactions
     WHERE user_id = ${userId} AND amount > 0
     `;
 
     const expensesResult = await sql`
-    SELECT COALESCE(SUM(amount),0) as expenses FROM transaction 
+    SELECT COALESCE(SUM(amount),0) as expenses FROM transactions
     WHERE user_id = ${userId} AND amount < 0    
     `;
 

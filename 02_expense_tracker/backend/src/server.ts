@@ -4,11 +4,12 @@ import config from "./config/env.js";
 import transactionRoutes from "./routes/transactionsRoute.js";
 import job from "./config/cron.js";
 import ratelimiter from "./middlewares/rateLimiter.js";
+import cors from "cors"
 
 const app = express();
 
 if (process.env.NODE_ENV === "production") job.start();
-
+app.use(cors())
 app.use(express.json());
 app.use(ratelimiter);
 

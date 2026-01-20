@@ -6,9 +6,10 @@ import { COLORS } from "@/constants/colors";
 const PageLoader = () => {
   return (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size={"large"} color={COLORS.primary}>
-        PageLoader
-      </ActivityIndicator>
+      <ActivityIndicator
+        size={"large"}
+        color={COLORS.primary}
+      ></ActivityIndicator>
     </View>
   );
 };

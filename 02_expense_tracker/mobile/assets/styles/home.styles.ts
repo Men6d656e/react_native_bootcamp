@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
-    paddingHorizontal: 12,
+    paddingHorizontal: 0,
     paddingVertical: 12,
   },
   headerLeft: {

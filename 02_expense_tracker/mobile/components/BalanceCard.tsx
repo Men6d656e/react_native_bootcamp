@@ -8,13 +8,13 @@ const BalanceCard = ({ summary }: { summary: Summary }) => {
   return (
     <View style={styles.balanceCard}>
       <Text style={styles.balanceTitle}>Total Balance</Text>
-      <Text style={styles.balanceTitle}>
+      <Text style={styles.balanceAmount}>
         ${parseFloat(summary.balance).toFixed(2)}
       </Text>
       <View style={styles.balanceStats}>
         <View style={styles.balanceStatItem}>
           <Text style={styles.balanceStatLabel}>Income</Text>
-          <Text style={[styles.balanceAmount, { color: COLORS.income }]}>
+          <Text style={[styles.balanceStatAmount, { color: COLORS.income }]}>
             +${parseFloat(summary.income).toFixed(2)}
           </Text>
         </View>

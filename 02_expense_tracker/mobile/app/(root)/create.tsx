@@ -43,6 +43,7 @@ const CreateScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreate = async () => {
+    if (!user?.id) return Alert.alert("Error", "User not authenticated");
     // validations
     if (!title.trim())
       return Alert.alert("Error", "Please enter a transaction title");
@@ -59,7 +60,7 @@ const CreateScreen = () => {
         ? -Math.abs(parseFloat(amount))
         : Math.abs(parseFloat(amount));
 
-      const response = await fetch(`${API_URL}/transactions`, {
+      const response = await fetch(`${API_URL}/api/transactions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +78,9 @@ const CreateScreen = () => {
         console.log(errorData);
         throw new Error(errorData.error || "Failed to create transaction");
       }
-      Alert.alert("Success", "Transaction created successfully");
+      Alert.alert("Success", "Transaction created successfully", [
+        { text: "OK", onPress: () => router.back() }, // Redirect on click
+      ]);
     } catch (error) {
       const erMsg =
         error instanceof Error ? error.message : "Failed to create transaction";

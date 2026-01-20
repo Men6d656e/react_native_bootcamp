@@ -5,7 +5,7 @@ import PageLoader from "@/components/PageLoader";
 import { SignOutButton } from "@/components/SignOutButton";
 import TransactionItem from "@/components/TransactionItem";
 import { useTransactions } from "@/hooks/useTransacions";
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -58,7 +58,7 @@ export default function Page() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
+      <View style={styles.content}>
         {/* Header */}
 
         <View style={styles.header}>
@@ -92,8 +92,9 @@ export default function Page() {
         {/* Balance cart */}
         <BalanceCard summary={summary} />
 
-        {/* Balance cart
-        <BalanceCard summary={summary} /> */}
+        <View style={styles.transactionsHeaderContainer}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        </View>
       </View>
       <FlatList
         style={styles.transactionsList}

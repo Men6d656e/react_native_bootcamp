@@ -1,50 +1,80 @@
-# Welcome to your Expo app 👋
+# 📱 Expense Tracker Mobile (React Native)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is the frontend component of the Expense Tracker application, built with **React Native** and **Expo**. It provides a sleek, intuitive interface for managing personal finances on the go.
 
-## Get started
+## 🌟 Frontend Highlights
 
-1. Install dependencies
+The primary focus of this module was mastering **Clerk Authentication** within a native environment. Moving from web to mobile required a different approach to session management and routing.
 
-   ```bash
-   npm install
-   ```
+* **Native Auth Integration:** Implemented secure login and signup using the Clerk Expo SDK, utilizing `tokenCache` for persistent sessions.
+* **OTP Verification Flow:** Built a custom UI to handle email-based One-Time Password (OTP) verification for new users.
+* **Dynamic UI Layouts:** Leveraged `expo-router` to create protected route groups—ensuring the dashboard is only accessible to authenticated users.
+* **Custom Hooks:** Developed `useTransactions` to abstract complex API logic, managing global loading and error states for a smooth UX.
 
-2. Start the app
+## 🚀 Key Mobile Features
 
-   ```bash
-   npx expo start
-   ```
+* **Interactive Dashboard:** Visual summary of Balance, Income, and Expenses with color-coded feedback.
+* **Smart Transactions:** Category-specific iconography for quick identification of spending habits.
+* **Gestures & Feedback:** Integrated `RefreshControl` for "pull-to-refresh" functionality and native `Alert` components for destructive actions like deletions.
+* **Adaptive UI:** Styled with a custom color palette that remains consistent across different device sizes using Flexbox.
 
-In the output, you'll find options to open the app in a
+## 🛠️ Mobile Setup & Installation
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+1. **Navigate to the mobile directory:**
 ```bash
-npm run reset-project
+cd 02_expense_tracker/mobile
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
+2. **Install dependencies:**
+```bash
+npm install
 
-To learn more about developing your project with Expo, look at the following resources:
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Join the community
+3. **Environment Configuration:**
+Create a `.env` file in the root of the mobile folder and add your Clerk credentials:
+```env
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 
-Join our community of developers creating universal apps.
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+4. **Connect to Backend:**
+Update your `API_URL` in `@/constants/api.ts` to point to your deployed Render backend or your local IP address.
+5. **Start the app:**
+```bash
+npx expo start
+
+```
+
+
+
+## 📦 Building for Android (APK)
+
+This project is configured for **Expo EAS Build**. To generate a new APK:
+
+1. Ensure you have `eas-cli` installed.
+2. Run the preview build command:
+```bash
+eas build -p android --profile preview
+
+```
+
+
+
+---
+
+### **GitHub Release Notes (v1.0.0)**
+
+When you upload your APK to the GitHub Release section, you can use this short summary:
+
+> **Version 1.0.0 - Initial Release**
+> * Full integration with Clerk for secure mobile authentication.
+> * Complete CRUD functionality for transactions.
+> * Integrated custom balance summary cards.
+> * **Note:** This APK connects to a demo backend active for 3 months. For long-term use, please deploy your own backend using the instructions in the main repository.
+> 
+> 

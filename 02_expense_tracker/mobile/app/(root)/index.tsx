@@ -24,8 +24,14 @@ export default function Page() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { transactions, deleteTransaction, isLoading, loadData, summary } =
-    useTransactions(user?.id);
+  const {
+    transactions,
+    deleteTransaction,
+    isLoading,
+    loadData,
+    summary,
+    error,
+  } = useTransactions(user?.id);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -40,6 +46,31 @@ export default function Page() {
   }, [user?.id, loadData]);
 
   if (isLoading && !refreshing) return <PageLoader />;
+
+  if (error && transactions.length === 0) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center", padding: 20 },
+        ]}
+      >
+        <Ionicons name="cloud-offline-outline" size={64} color="#ccc" />
+        <Text style={{ fontSize: 18, marginVertical: 10 }}>
+          Oops! Something went wrong
+        </Text>
+        <Text style={{ color: "gray", textAlign: "center", marginBottom: 20 }}>
+          {error}
+        </Text>
+        <TouchableOpacity
+          style={[styles.tryagainButton, { width: 150 }]}
+          onPress={() => loadData()}
+        >
+          <Text style={styles.addButtonText}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const handleDelete = (id: number) => {
     Alert.alert(

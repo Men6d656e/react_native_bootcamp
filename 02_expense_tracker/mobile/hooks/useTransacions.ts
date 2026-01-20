@@ -31,7 +31,7 @@ export const useTransactions = (userId: string | undefined) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchTransactions = useCallback(async () => {
-    const response = await fetch(`${API_URL}/transactions/${userId}`);
+    const response = await fetch(`${API_URL}/api/transactions/${userId}`);
     if (!response.ok) throw new Error("Failed to fetch history");
     const data = await response.json();
     // Fix: Access the array inside the response object
@@ -39,7 +39,9 @@ export const useTransactions = (userId: string | undefined) => {
   }, [userId]);
 
   const fetchSummary = useCallback(async () => {
-    const response = await fetch(`${API_URL}/transactions/summary/${userId}`);
+    const response = await fetch(
+      `${API_URL}/api/transactions/summary/${userId}`,
+    );
     if (!response.ok) throw new Error("Failed to fetch summary");
     const data = await response.json();
     // Ensure numbers are handled correctly
@@ -67,7 +69,7 @@ export const useTransactions = (userId: string | undefined) => {
 
   const deleteTransaction = async (id: number) => {
     try {
-      const response = await fetch(`${API_URL}/transactions/${id}`, {
+      const response = await fetch(`${API_URL}/api/transactions/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Delete failed");
@@ -79,5 +81,12 @@ export const useTransactions = (userId: string | undefined) => {
       Alert.alert("Error", "Could not delete transaction");
     }
   };
-  return { transactions, summary, isLoading, loadData, deleteTransaction };
+  return {
+    transactions,
+    summary,
+    isLoading,
+    loadData,
+    deleteTransaction,
+    error,
+  };
 };

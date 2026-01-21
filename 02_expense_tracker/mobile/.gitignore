@@ -44,4 +44,4 @@ app-example
 /android
 .env
 
-.expo/
+.expo/.expo/

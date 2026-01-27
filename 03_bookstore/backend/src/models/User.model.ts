@@ -1,4 +1,4 @@
-import mongoose, { Document, Model } from "mongoose";
+import mongoose, { Document, Model, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
@@ -6,6 +6,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   profileImage?: string;
+  createdAt: Date;
+  updatedAt: Date;
   comparePassword(userPassword: string): Promise<boolean>;
 }
 

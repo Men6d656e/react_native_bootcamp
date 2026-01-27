@@ -6,13 +6,13 @@ let mongo: MongoMemoryServer;
 // We provide a very long timeout (120s) for the fresh download
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create({
-    binary:{
-      version:"6.0.11"
+    binary: {
+      version: "6.0.11"
     }
   });
   const uri = mongo.getUri();
   await mongoose.connect(uri);
-}, 600000); 
+}, 600000);
 
 
 afterAll(async () => {

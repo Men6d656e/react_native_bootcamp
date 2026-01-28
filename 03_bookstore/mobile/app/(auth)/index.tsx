@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import COLORS from "@/constants/colors";
 import { Link } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
+import Loader from "@/components/Loader";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ const Login = () => {
     }
   };
 
-  if (!isCheckingAuth) return null;
+  if (isCheckingAuth) return <Loader />;
 
   return (
     <KeyboardAvoidingView

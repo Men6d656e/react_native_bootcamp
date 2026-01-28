@@ -64,7 +64,6 @@ const Home = () => {
       } else setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchBooks();
   }, []);

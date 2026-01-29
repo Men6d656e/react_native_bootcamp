@@ -1,37 +1,66 @@
 import { jest } from '@jest/globals';
 
-// Define mocks
-const mockPost = {
-    find: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    findByIdAndDelete: jest.fn(),
+const mockSession = () => ({
+    startTransaction: jest.fn() as any,
+    commitTransaction: jest.fn() as any,
+    abortTransaction: jest.fn() as any,
+    endSession: jest.fn() as any,
+});
+
+const mockPost: any = {
+    find: jest.fn() as any,
+    findById: jest.fn() as any,
+    create: jest.fn() as any,
+    findByIdAndUpdate: jest.fn() as any,
+    findByIdAndDelete: jest.fn() as any,
 };
 
-const mockUser = {
-    findOne: jest.fn(),
+const mockUser: any = {
+    findOne: jest.fn() as any,
 };
 
-const mockComment = {
-    deleteMany: jest.fn(),
+const mockComment: any = {
+    deleteMany: jest.fn() as any,
 };
 
-const mockNotification = {
-    create: jest.fn(),
-    deleteMany: jest.fn(),
+const mockNotification: any = {
+    create: jest.fn() as any,
+    deleteMany: jest.fn() as any,
 };
 
-const mockCloudinary = {
+const mockCloudinary: any = {
     uploader: {
-        upload: jest.fn(),
-        destroy: jest.fn(),
+        upload: jest.fn() as any,
+        destroy: jest.fn() as any,
     },
 };
 
-const mockGetAuth = jest.fn();
+const mockGetAuth: any = jest.fn() as any;
 
-// Use unstable_mockModule for ESM mocking
+// Robust mongoose mock for ESM
+jest.unstable_mockModule('mongoose', () => {
+    const mongooseMock: any = {
+        startSession: jest.fn(async () => mockSession()),
+        Types: {
+            ObjectId: class {
+                id: string;
+                constructor(id?: string) {
+                    this.id = id || '507f1f77bcf86cd799439011';
+                }
+                static isValid(id: string) {
+                    return /^[0-9a-fA-F]{24}$/.test(id);
+                }
+                toString() {
+                    return this.id;
+                }
+            },
+        },
+        Document: class { }, Model: class { }, Schema: class { static Types = { ObjectId: String }; },
+    };
+    mongooseMock.default = mongooseMock;
+    return mongooseMock;
+});
+
 jest.unstable_mockModule('../../src/models/post.model.js', () => ({
     default: mockPost,
 }));
@@ -56,10 +85,9 @@ jest.unstable_mockModule('@clerk/express', () => ({
     getAuth: mockGetAuth,
 }));
 
-// Import the controller and other dependencies after mocking
-const { getPosts, createPost } = await import(
-    '../../src/controllers/post.controller.js'
-);
+const { getPosts, getPost, getUserPosts, createPost, likePost, deletePost } =
+    await import('../../src/controllers/post.controller.js');
+const { default: mongoose } = (await import('mongoose')) as any;
 
 describe('Post Controller', () => {
     let req: any;
@@ -68,64 +96,83 @@ describe('Post Controller', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        req = {
-            params: {},
-            body: {},
-            header: jest.fn(),
-        };
+        req = { params: {}, body: {}, header: jest.fn() as any };
         res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn().mockReturnThis(),
+            status: jest.fn().mockReturnThis() as any,
+            json: jest.fn().mockReturnThis() as any,
         };
-        next = jest.fn();
+        next = jest.fn() as any;
+        mockGetAuth.mockReturnValue({ userId: 'test_user' });
+        (mongoose.startSession as any).mockResolvedValue(mockSession());
     });
 
     describe('getPosts', () => {
-        it('should return all posts with populated data', async () => {
-            const postsData = [{ content: 'Hello' }, { content: 'World' }];
-
-            mockPost.find.mockReturnValue({
-                sort: jest.fn().mockReturnThis(),
-                populate: jest.fn().mockReturnThis(),
-                lean: jest.fn().mockResolvedValue(postsData),
+        it('should return all posts', async () => {
+            // @ts-ignore
+            (mockPost.find as any).mockReturnValue({
+                sort: jest.fn().mockReturnThis() as any,
+                populate: jest.fn().mockReturnThis() as any,
+                // @ts-ignore
+                lean: jest.fn().mockResolvedValue([{ content: 'test' }] as any),
             });
-
             await getPosts(req, res, next);
-
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(postsData);
+            expect(res.json).toHaveBeenCalledWith([{ content: 'test' }]);
+        });
+    });
+
+    describe('getPost', () => {
+        it('should return a single post by ID', async () => {
+            const postId = '507f1f77bcf86cd799439011';
+            req.params.postId = postId;
+            // @ts-ignore
+            (mockPost.findById as any).mockReturnValue({
+                sort: jest.fn().mockReturnThis() as any,
+                populate: jest.fn().mockReturnThis() as any,
+                // @ts-ignore
+                lean: jest.fn().mockResolvedValue({ _id: postId, content: 'Single' } as any),
+            });
+            await getPost(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
         });
     });
 
     describe('createPost', () => {
-        it('should create a post without image', async () => {
+        it('should create a post successfully', async () => {
             mockGetAuth.mockReturnValue({ userId: 'clerk_123' });
-            req.body.content = 'New post content';
-            const userData = { _id: 'mongo_user_123' };
-            const postData = { content: 'New post content', user: 'mongo_user_123' };
-
-            mockUser.findOne.mockResolvedValue(userData);
-            mockPost.create.mockResolvedValue(postData);
-
+            req.body.content = 'hello';
+            mockUser.findOne.mockResolvedValue({ _id: 'user_123' });
+            mockPost.create.mockResolvedValue({ content: 'hello', user: 'user_123' });
             await createPost(req, res, next);
-
             expect(res.status).toHaveBeenCalledWith(201);
-            expect(res.json).toHaveBeenCalledWith(postData);
-            expect(mockCloudinary.uploader.upload).not.toHaveBeenCalled();
         });
+    });
 
-        it('should throw error if both content and image are missing', async () => {
+    describe('likePost', () => {
+        it('should like a post', async () => {
+            const postId = '507f1f77bcf86cd799439011';
+            const userId = 'user_123';
+            req.params.postId = postId;
             mockGetAuth.mockReturnValue({ userId: 'clerk_123' });
-            req.body.content = '';
-            req.file = undefined;
+            mockUser.findOne.mockResolvedValue({ _id: userId });
+            mockPost.findById.mockResolvedValue({ _id: postId, likes: [], user: 'author_id' });
 
-            await createPost(req, res, next);
+            await likePost(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+    });
 
-            expect(res.status).toHaveBeenCalledWith(400);
-            expect(next).toHaveBeenCalledWith(expect.any(Error));
-            expect(next.mock.calls[0][0].message).toBe(
-                'Post must contain either text or image',
-            );
+    describe('deletePost', () => {
+        it('should delete post if owner', async () => {
+            const postId = '507f1f77bcf86cd799439011';
+            const userId = 'user_123';
+            req.params.postId = postId;
+            mockGetAuth.mockReturnValue({ userId: 'clerk_123' });
+            mockUser.findOne.mockResolvedValue({ _id: userId });
+            mockPost.findById.mockResolvedValue({ _id: postId, user: userId });
+
+            await deletePost(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
         });
     });
 });

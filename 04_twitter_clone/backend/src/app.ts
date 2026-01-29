@@ -7,6 +7,7 @@ import postRoutes from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import { arcjetMiddleware } from "./middlewares/arcjet.middleware.js";
+import connectDB from "./lib/db.js";
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(clerkMiddleware());
 app.use(arcjetMiddleware);
 app.use(cors());
 app.use(express.json());
+
+connectDB();
 
 // Basic route for testing
 app.get("/", (req, res) => {

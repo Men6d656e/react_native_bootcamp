@@ -11,10 +11,10 @@ import connectDB from "./lib/db.js";
 
 const app = express();
 
-app.use(clerkMiddleware());
-app.use(arcjetMiddleware);
 app.use(cors());
 app.use(express.json());
+app.use(clerkMiddleware());
+app.use(arcjetMiddleware);
 
 connectDB();
 

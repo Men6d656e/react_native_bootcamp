@@ -1,8 +1,13 @@
-import { Stack, Tabs } from "expo-router";
+import { Redirect, Stack, Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "@clerk/clerk-expo";
 export default function TabsLayout() {
   const inset = useSafeAreaInsets();
+  const { isSignedIn } = useAuth();
+
+  if (!isSignedIn) return <Redirect href="/(auth)" />;
+
   return (
     <Tabs
       screenOptions={{

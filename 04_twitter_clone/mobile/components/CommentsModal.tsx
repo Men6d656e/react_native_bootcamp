@@ -1,5 +1,5 @@
-import { useComments } from "@/hooks/useComments";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useComments } from "@/hook/useComments";
+import { useCurrentUser } from "@/hook/useCurrentUser";
 import { Post } from "@/types";
 import {
   View,

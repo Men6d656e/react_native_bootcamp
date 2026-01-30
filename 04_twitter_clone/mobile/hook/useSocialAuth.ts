@@ -1,3 +1,4 @@
+import * as Linking from "expo-linking"; // 1. Import this
 import { useSSO } from "@clerk/clerk-expo";
 import { useState } from "react";
 import { Alert } from "react-native";
@@ -8,9 +9,13 @@ export const useSocialAuth = () => {
   const { startSSOFlow } = useSSO();
 
   const handleSocialAuth = async (strategy: "oauth_google" | "oauth_apple") => {
-    setLoadingProvider(strategy); 
+    setLoadingProvider(strategy);
     try {
-      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      const redirectUrl = Linking.createURL("/", { scheme: "twitter-clone" });
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy,
+        redirectUrl,
+      });
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
       }

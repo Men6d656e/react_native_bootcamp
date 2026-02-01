@@ -1,8 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { useAuth } from "@clerk/clerk-expo";
 
-// const API_BASE_URL = "https://react-native-bootcamp-w4vc.vercel.app/api";
-const API_BASE_URL = "https://c609a420a8af.ngrok-free.app/api";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const createApiClient = (
   getToken: () => Promise<string | null>,

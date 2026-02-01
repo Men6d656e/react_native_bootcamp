@@ -5,6 +5,7 @@ module.exports = function (api) {
       ["babel-preset-expo", { jsxImportSource: "nativewind" }],
       "nativewind/babel",
     ],
-    Plugin: ["nativewind/babel"],
+    // If you need specific plugins later, they go here in lowercase:
+    plugins: [],
   };
 };

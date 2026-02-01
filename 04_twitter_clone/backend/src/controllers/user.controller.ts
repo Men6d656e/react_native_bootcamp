@@ -67,35 +67,79 @@ export const updateProfile = asyncHandler(
 /**
  * @desc    Sync Clerk User with MongoDB (Idempotent)
  */
+// export const syncUser = asyncHandler(async (req: Request, res: Response) => {
+//   const { userId } = getAuth(req);
+//   if (!userId) {
+//     res.status(401);
+//     throw new Error("Unauthorized");
+//   }
+//   let user = await User.findOne({ clerkId: userId });
+
+//   if (user) {
+//     res.status(200).json({ user, message: "User already synced" });
+//     return;
+//   }
+//   const clerkUser = await clerkClient.users.getUser(userId);
+//   const primaryEmail =
+//     clerkUser.emailAddresses[0]?.emailAddress ??
+//     `user_${Math.floor(Math.random() * 1000)}`;
+
+//   const userData: Partial<IUser> = {
+//     clerkId: userId,
+//     email: primaryEmail,
+//     firstName: clerkUser.firstName ?? "",
+//     lastName: clerkUser.lastName ?? "",
+//     username:
+//       clerkUser.username ?? primaryEmail.split("@")[0] ?? uniqueNameGenrator(),
+//     profilePicture: clerkUser.imageUrl ?? "",
+//   };
+//   user = await User.create(userData);
+
+//   res.status(201).json({ user, message: "User created successfully" });
+// });
+
 export const syncUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   if (!userId) {
     res.status(401);
     throw new Error("Unauthorized");
   }
-  let user = await User.findOne({ clerkId: userId });
 
-  if (user) {
-    res.status(200).json({ user, message: "User already synced" });
-    return;
+  try {
+    let user = await User.findOne({ clerkId: userId });
+
+    if (user) {
+      res.status(200).json({ user, message: "User already synced" });
+      return;
+    }
+
+    // This line is likely where the 500 crash happens
+    const clerkUser = await clerkClient.users.getUser(userId);
+
+    const primaryEmail =
+      clerkUser.emailAddresses?.[0]?.emailAddress || `user_${userId}`;
+
+    const userData: Partial<IUser> = {
+      clerkId: userId,
+      email: primaryEmail,
+      firstName: clerkUser.firstName || "",
+      lastName: clerkUser.lastName || "",
+      username:
+        clerkUser.username ||
+        primaryEmail.split("@")[0] ||
+        uniqueNameGenrator(),
+      profilePicture: clerkUser.imageUrl || "",
+    };
+
+    user = await User.create(userData);
+    res.status(201).json({ user, message: "User created successfully" });
+  } catch (error: any) {
+    // This will print the REAL error in your backend terminal
+    console.error("SYNC ERROR:", error.message);
+    res
+      .status(500)
+      .json({ error: "Backend Sync Failed", details: error.message });
   }
-  const clerkUser = await clerkClient.users.getUser(userId);
-  const primaryEmail =
-    clerkUser.emailAddresses[0]?.emailAddress ??
-    `user_${Math.floor(Math.random() * 1000)}`;
-
-  const userData: Partial<IUser> = {
-    clerkId: userId,
-    email: primaryEmail,
-    firstName: clerkUser.firstName ?? "",
-    lastName: clerkUser.lastName ?? "",
-    username:
-      clerkUser.username ?? primaryEmail.split("@")[0] ?? uniqueNameGenrator(),
-    profilePicture: clerkUser.imageUrl ?? "",
-  };
-  user = await User.create(userData);
-
-  res.status(201).json({ user, message: "User created successfully" });
 });
 
 /**

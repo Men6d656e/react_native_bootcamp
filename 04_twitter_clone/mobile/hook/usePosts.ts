@@ -4,16 +4,23 @@ import { useApiClient, postApi } from "../utils/api";
 export const usePosts = (username?: string) => {
   const api = useApiClient();
   const queryClient = useQueryClient();
-
+  const isProfileMode = !!username;
   const {
     data: postsData,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: username ? ["userPosts", username] : ["posts"],
-    queryFn: () => (username ? postApi.getUserPosts(api, username) : postApi.getPosts(api)),
-    select: (response) => response.data.posts,
+    queryKey: isProfileMode ? ["userPosts", username] : ["posts"],
+    queryFn: () =>
+      isProfileMode
+        ? postApi.getUserPosts(api, username)
+        : postApi.getPosts(api),
+    select: (response) => {
+      return Array.isArray(response.data)
+        ? response.data
+        : response.data?.posts || [];
+    },
   });
 
   const likePostMutation = useMutation({

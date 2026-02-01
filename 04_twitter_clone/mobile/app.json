@@ -19,7 +19,8 @@
       }
     },
     "web": {
-      "output": "static"
+      "output": "static",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -35,6 +36,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0edd36cd-b259-443b-95eb-4df4fde0a7cb"
+      }
     }
   }
 }

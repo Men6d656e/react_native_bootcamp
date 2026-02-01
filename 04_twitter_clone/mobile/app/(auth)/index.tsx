@@ -15,7 +15,7 @@ export default function Index() {
   return (
     <View className="flex-1 bg-white">
       <View className="flex-1 px-8 justify-between">
-        <View className="flex-1 justify-center">
+        <View className="flex-1 justify-evenly">
           {/* DEMO IMAGE */}
           <View className="items-center">
             <Image
@@ -25,7 +25,7 @@ export default function Index() {
             />
           </View>
 
-          <View className="flex-col gap-5 my-5">
+          <View className="flex-col gap-10 my-5">
             {/* GOOGLE SIGNIN BTN */}
             <TouchableOpacity
               className="flex-row items-center justify-center bg-white border border-gray-300 rounded-full py-3 px-6"
@@ -74,7 +74,7 @@ export default function Index() {
                 <View className="flex-row items-center justify-center">
                   <Image
                     source={require("../../assets/images/apple.png")}
-                    className="size-8 mr-3"
+                    className="size-10 mr-3"
                     resizeMode="contain"
                   />
                   <Text className="text-black font-medium text-base">
@@ -85,12 +85,8 @@ export default function Index() {
             </TouchableOpacity>
           </View>
 
-          <Link href={"/(tabs)"}>
-            <Text>Tabs</Text>
-          </Link>
-
           {/* Terms and Privacy */}
-          <Text className="text-center text-gray-500 text-xs leading-4 mt-6 px-2">
+          <Text className="text-center text-gray-500 text-xs leading-4 px-2">
             By signing up, you agree to our{" "}
             <Text className="text-blue-500">Terms</Text>
             {", "}

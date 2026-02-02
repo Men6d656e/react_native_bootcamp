@@ -8,12 +8,14 @@ import {
   getPosts,
   getUserPosts,
   likePost,
+  searchPosts,
 } from "../controllers/post.controller.js";
 
 const router = Router();
 
 // public routes
 router.get("/", getPosts);
+router.get("/search", searchPosts);
 router.get("/:postId", getPost);
 router.get("/user/:username", getUserPosts);
 

@@ -79,13 +79,14 @@ jest.unstable_mockModule('../../src/models/notification.js', () => ({
 
 jest.unstable_mockModule('../../src/lib/cloudinary.js', () => ({
     default: mockCloudinary,
+    uploadToCloudinary: mockCloudinary.uploader.upload,
 }));
 
 jest.unstable_mockModule('@clerk/express', () => ({
     getAuth: mockGetAuth,
 }));
 
-const { getPosts, getPost, getUserPosts, createPost, likePost, deletePost } =
+const { getPosts, getPost, getUserPosts, createPost, likePost, deletePost, searchPosts } =
     await import('../../src/controllers/post.controller.js');
 const { default: mongoose } = (await import('mongoose')) as any;
 
@@ -96,7 +97,7 @@ describe('Post Controller', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        req = { params: {}, body: {}, header: jest.fn() as any };
+        req = { params: {}, body: {}, query: {}, header: jest.fn() as any };
         res = {
             status: jest.fn().mockReturnThis() as any,
             json: jest.fn().mockReturnThis() as any,
@@ -173,6 +174,27 @@ describe('Post Controller', () => {
 
             await deletePost(req, res, next);
             expect(res.status).toHaveBeenCalledWith(200);
+        });
+    });
+
+    describe('searchPosts', () => {
+        it('should return search results', async () => {
+            req.query.q = 'test';
+            (mockPost.find as any).mockReturnValue({
+                sort: jest.fn().mockReturnThis() as any,
+                populate: jest.fn().mockReturnThis() as any,
+                lean: jest.fn().mockResolvedValue([{ content: 'test post' }] as any) as any,
+            });
+
+            await searchPosts(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith([{ content: 'test post' }]);
+        });
+
+        it('should error if no query provided', async () => {
+            req.query.q = '';
+            await searchPosts(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(400);
         });
     });
 });

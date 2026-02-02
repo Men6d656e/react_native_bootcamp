@@ -8,6 +8,7 @@ interface PostCardProps {
   onLike: (postId: string) => void;
   onDelete: (postId: string) => void;
   onComment: (post: Post) => void;
+  onFollow?: (targetUserId: string) => void;
   isLiked?: boolean;
   currentUser: User;
 }
@@ -19,8 +20,10 @@ const PostCard = ({
   post,
   isLiked,
   onComment,
+  onFollow,
 }: PostCardProps) => {
-  const isOwnPost = post.user._id === currentUser._id;
+  const isOwnPost = post.user?._id === currentUser?._id;
+  const isFollowing = currentUser?.following?.includes(post.user?._id);
 
   const handleDelete = () => {
     Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
@@ -37,25 +40,39 @@ const PostCard = ({
     <View className="border-b border-gray-100 bg-white">
       <View className="flex-row p-4">
         <Image
-          source={{ uri: post.user.profilePicture || "" }}
+          source={{ uri: post.user?.profilePicture || "" }}
           className="w-12 h-12 rounded-full mr-3"
         />
 
         <View className="flex-1">
-          <View className="flex-row items-center justify-between mb-1">
-            <View className="flex-row items-center">
-              <Text className="font-bold text-gray-900 mr-1">
-                {post.user.firstName} {post.user.lastName}
-              </Text>
-              <Text className="text-gray-500 ml-1">
-                @{post.user.username} · {formatDate(post.createdAt)}
-              </Text>
+          <View className="flex-row items-start justify-between mb-1">
+            <View className="flex-1 mr-2">
+              <View className="flex-row items-center flex-wrap">
+                <Text className="font-bold text-gray-900 mr-1">
+                  {post.user?.firstName} {post.user?.lastName}
+                </Text>
+                <Text className="text-gray-500 text-sm">
+                  @{post.user?.username} · {formatDate(post.createdAt)}
+                </Text>
+              </View>
             </View>
-            {isOwnPost && (
-              <TouchableOpacity onPress={handleDelete}>
-                <Feather name="trash" size={20} color="#657786" />
-              </TouchableOpacity>
-            )}
+            <View className="flex-row items-center">
+              {!isOwnPost && onFollow && (
+                <TouchableOpacity
+                  onPress={() => onFollow(post.user?._id)}
+                  className={`mr-2 px-3 py-1 rounded-full border ${isFollowing ? 'bg-black border-black' : 'border-gray-300'}`}
+                >
+                  <Text className={`text-xs font-bold ${isFollowing ? 'text-white' : 'text-black'}`}>
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {isOwnPost && (
+                <TouchableOpacity onPress={handleDelete}>
+                  <Feather name="trash" size={18} color="#657786" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           {post.content && (

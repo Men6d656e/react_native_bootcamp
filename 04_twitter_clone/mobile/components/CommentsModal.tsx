@@ -1,6 +1,7 @@
 import { useComments } from "@/hook/useComments";
 import { useCurrentUser } from "@/hook/useCurrentUser";
 import { Post } from "@/types";
+import { Feather } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 
 interface CommentsModalProps {
@@ -18,12 +20,29 @@ interface CommentsModalProps {
 }
 
 const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
-  const { commentText, setCommentText, createComment, isCreatingComment } = useComments();
+  const {
+    commentText,
+    setCommentText,
+    createComment,
+    isCreatingComment,
+    deleteComment
+  } = useComments();
   const { currentUser } = useCurrentUser();
 
   const handleClose = () => {
     onClose();
     setCommentText("");
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    Alert.alert("Delete Comment", "Are you sure you want to delete this comment?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => deleteComment(commentId),
+      },
+    ]);
   };
 
   return (
@@ -82,11 +101,18 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                 />
 
                 <View className="flex-1">
-                  <View className="flex-row items-center mb-1">
-                    <Text className="font-bold text-gray-900 mr-1">
-                      {comment.user.firstName} {comment.user.lastName}
-                    </Text>
-                    <Text className="text-gray-500 text-sm ml-1">@{comment.user.username}</Text>
+                  <View className="flex-row items-center justify-between mb-1">
+                    <View className="flex-row items-center">
+                      <Text className="font-bold text-gray-900 mr-1">
+                        {comment.user.firstName} {comment.user.lastName}
+                      </Text>
+                      <Text className="text-gray-500 text-sm ml-1">@{comment.user.username}</Text>
+                    </View>
+                    {currentUser?._id === comment.user._id && (
+                      <TouchableOpacity onPress={() => handleDeleteComment(comment._id)}>
+                        <Feather name="trash-2" size={16} color="#657786" />
+                      </TouchableOpacity>
+                    )}
                   </View>
 
                   <Text className="text-gray-900 text-base leading-5 mb-2">{comment.content}</Text>
@@ -116,9 +142,8 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                 />
 
                 <TouchableOpacity
-                  className={`px-4 py-2 rounded-lg self-start ${
-                    commentText.trim() ? "bg-blue-500" : "bg-gray-300"
-                  }`}
+                  className={`px-4 py-2 rounded-lg self-start ${commentText.trim() ? "bg-blue-500" : "bg-gray-300"
+                    }`}
                   onPress={() => createComment(selectedPost._id)}
                   disabled={isCreatingComment || !commentText.trim()}
                 >
@@ -126,9 +151,8 @@ const CommentsModal = ({ selectedPost, onClose }: CommentsModalProps) => {
                     <ActivityIndicator size={"small"} color={"white"} />
                   ) : (
                     <Text
-                      className={`font-semibold ${
-                        commentText.trim() ? "text-white" : "text-gray-500"
-                      }`}
+                      className={`font-semibold ${commentText.trim() ? "text-white" : "text-gray-500"
+                        }`}
                     >
                       Reply
                     </Text>

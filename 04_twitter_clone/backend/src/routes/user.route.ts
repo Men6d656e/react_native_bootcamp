@@ -7,6 +7,7 @@ import {
   syncUser,
   updateProfile,
 } from "../controllers/user.controller.js";
+import { uploadProfileMiddleware } from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.get("/profile/:username", getUserProfile);
 // private routes
 router.post("/sync", authMiddleware, syncUser);
 router.get("/me", authMiddleware, getCurrentUser);
-router.put("/profile", authMiddleware, updateProfile);
+router.put("/profile", authMiddleware, uploadProfileMiddleware, updateProfile);
 router.post("/follow/:targetUserId", authMiddleware, followUser);
 
 export default router;

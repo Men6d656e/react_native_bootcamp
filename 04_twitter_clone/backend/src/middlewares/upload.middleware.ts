@@ -15,3 +15,7 @@ const upload = multer({
 });
 
 export const uploadImageMiddleware = upload.single("image");
+export const uploadProfileMiddleware = upload.fields([
+  { name: "profilePicture", maxCount: 1 },
+  { name: "bannerImage", maxCount: 1 },
+]);

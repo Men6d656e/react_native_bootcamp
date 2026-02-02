@@ -6,7 +6,7 @@ import { getAuth } from "@clerk/express";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import Comment from "../models/comment.model.js";
-import cloudinary from "../lib/cloudinary.js";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary.js";
 import Notification from "../models/notification.js";
 
 /**
@@ -115,12 +115,11 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   let imageUrl = "";
 
   if (imageFile) {
-    const base64Image = `data:${imageFile.mimetype};base64,${imageFile.buffer.toString("base64")}`;
-
-    const uploadResponse = await cloudinary.uploader.upload(base64Image, {
-      folder: "twitter_clone_posts",
-      transformation: [{ width: 1000, crop: "limit" }, { quality: "auto" }],
-    });
+    const uploadResponse = await uploadToCloudinary(
+      imageFile,
+      "twitter_clone_posts",
+      [{ width: 1000, crop: "limit" }, { quality: "auto" }],
+    );
     imageUrl = uploadResponse.secure_url;
   }
 
@@ -245,4 +244,33 @@ export const deletePost = asyncHandler(async (req: Request, res: Response) => {
   } finally {
     session.endSession();
   }
+});
+
+/**
+ * @desc    Search posts by content
+ * @route   GET /api/posts/search?q=query
+ */
+export const searchPosts = asyncHandler(async (req: Request, res: Response) => {
+  const query = req.query.q as string;
+
+  if (!query) {
+    res.status(400);
+    throw new Error("Search query is required");
+  }
+
+  const posts = await Post.find({
+    content: { $regex: query, $options: "i" },
+  })
+    .sort({ createdAt: -1 })
+    .populate("user", "username firstName lastName profilePicture")
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "username firstName lastName profilePicture",
+      },
+    })
+    .lean();
+
+  res.status(200).json(posts);
 });

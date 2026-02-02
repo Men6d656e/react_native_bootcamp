@@ -5,6 +5,7 @@ import { useState } from "react";
 import CommentsModal from "./CommentsModal";
 import { useCurrentUser } from "@/hook/useCurrentUser";
 import { usePosts } from "@/hook/usePosts";
+import { useFollow } from "@/hook/useFollow";
 
 const PostsList = ({ username }: { username?: string }) => {
   const { currentUser } = useCurrentUser();
@@ -18,6 +19,7 @@ const PostsList = ({ username }: { username?: string }) => {
     deletePost,
     checkIsLiked,
   } = usePosts(username);
+  const { toggleFollow } = useFollow();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const selectedPost = selectedPostId
@@ -64,7 +66,8 @@ const PostsList = ({ username }: { username?: string }) => {
           onLike={toggleLike}
           onDelete={deletePost}
           onComment={(post: Post) => setSelectedPostId(post._id)}
-          currentUser={currentUser}
+          onFollow={toggleFollow}
+          currentUser={currentUser as any}
           isLiked={checkIsLiked(post.likes, currentUser)}
         />
       ))}

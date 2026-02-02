@@ -23,6 +23,16 @@ export const useComments = () => {
     },
   });
 
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: string) => commentApi.deleteComment(api, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to delete comment.");
+    },
+  });
+
   const createComment = (postId: string) => {
     if (!commentText.trim()) {
       Alert.alert("Empty Comment", "Please write something before posting!");
@@ -36,6 +46,8 @@ export const useComments = () => {
     commentText,
     setCommentText,
     createComment,
+    deleteComment: (commentId: string) => deleteCommentMutation.mutate(commentId),
     isCreatingComment: createCommentMutation.isPending,
+    isDeletingComment: deleteCommentMutation.isPending,
   };
 };

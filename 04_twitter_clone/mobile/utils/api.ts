@@ -29,6 +29,8 @@ export const userApi = {
   getCurrentUser: (api: AxiosInstance) => api.get("/users/me"),
   updateProfile: (api: AxiosInstance, data: any) =>
     api.put("/users/profile", data),
+  followUser: (api: AxiosInstance, targetUserId: string) =>
+    api.post(`/users/follow/${targetUserId}`),
 };
 
 export const postApi = {
@@ -41,9 +43,13 @@ export const postApi = {
     api.post(`/posts/${postId}/like`),
   deletePost: (api: AxiosInstance, postId: string) =>
     api.delete(`/posts/${postId}`),
+  searchPosts: (api: AxiosInstance, query: string) =>
+    api.get(`/posts/search`, { params: { q: query } }),
 };
 
 export const commentApi = {
   createComment: (api: AxiosInstance, postId: string, content: string) =>
     api.post(`/comments/post/${postId}`, { content }),
+  deleteComment: (api: AxiosInstance, commentId: string) =>
+    api.delete(`/comments/${commentId}`),
 };

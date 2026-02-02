@@ -72,6 +72,17 @@ jest.unstable_mockModule('../../src/models/notification.js', () => ({
 
 jest.unstable_mockModule('../../src/lib/utils.js', () => ({ default: mockUtils, ...mockUtils }));
 
+const mockCloudinary: any = {
+    uploader: {
+        upload: jest.fn().mockResolvedValue({ secure_url: 'http://example.com/image.jpg' }),
+    },
+};
+
+jest.unstable_mockModule('../../src/lib/cloudinary.js', () => ({
+    default: mockCloudinary,
+    uploadToCloudinary: mockCloudinary.uploader.upload,
+}));
+
 const { getUserProfile, getCurrentUser, updateProfile, syncUser, followUser } =
     await import('../../src/controllers/user.controller.js');
 const { default: mongoose } = (await import('mongoose')) as any;
@@ -83,7 +94,7 @@ describe('User Controller', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        req = { params: {}, body: {}, header: jest.fn() as any };
+        req = { params: {}, body: {}, query: {}, files: {}, header: jest.fn() as any };
         res = {
             status: jest.fn().mockReturnThis() as any,
             json: jest.fn().mockReturnThis() as any,
@@ -119,6 +130,7 @@ describe('User Controller', () => {
             await updateProfile(req, res, next);
             expect(res.status).toHaveBeenCalledWith(200);
         });
+
     });
 
     describe('syncUser', () => {
@@ -145,6 +157,20 @@ describe('User Controller', () => {
             });
             await followUser(req, res, next);
             expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Followed' }));
+        });
+
+        it('should unfollow user successfully', async () => {
+            const targetId = '507f1f77bcf86cd799439011';
+            req.params.targetUserId = targetId;
+            mockGetAuth.mockReturnValue({ userId: 'clerk_123' });
+            mockUser.findOne.mockResolvedValue({
+                _id: 'user_123',
+                following: [targetId]
+            });
+            await followUser(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Unfollowed' }));
         });
     });
 });

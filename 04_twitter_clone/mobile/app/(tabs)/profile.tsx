@@ -39,6 +39,9 @@ const ProfileScreens = () => {
     updateFormField,
     isUpdating,
     refetch: refetchProfile,
+    profilePicture,
+    bannerImage,
+    pickImage,
   } = useProfile();
 
   if (isLoading || !currentUser) {
@@ -160,6 +163,11 @@ const ProfileScreens = () => {
         saveProfile={saveProfile}
         updateFormField={updateFormField}
         isUpdating={isUpdating}
+        profilePicture={profilePicture}
+        bannerImage={bannerImage}
+        pickImage={pickImage}
+        currentProfilePicture={currentUser?.profilePicture}
+        currentBannerImage={currentUser?.bannerImage}
       />
     </SafeAreaView>
   );

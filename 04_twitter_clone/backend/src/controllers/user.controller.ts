@@ -5,10 +5,12 @@ import type { Request, Response } from "express";
 import { clerkClient, getAuth } from "@clerk/express";
 import mongoose from "mongoose";
 import { uniqueNameGenrator } from "../lib/utils.js";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary.js";
 
 /**
- * @desc Get user profile by username
- * @route GET /api/users/:username
+ * @desc    Get user profile by username
+ * @route   GET /api/users/profile/:username
+ * @access  Public
  */
 export const getUserProfile = asyncHandler(
   async (req: Request, res: Response) => {
@@ -28,27 +30,46 @@ export const getUserProfile = asyncHandler(
 );
 
 /**
- * @desc    Update user profile
- * @route   PATCH /api/users/profile
+ * @desc    Update user profile with optional image uploads
+ * @route   PUT /api/users/profile
+ * @access  Private
  */
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const { userId } = getAuth(req);
-    const { firstName, lastName, bio, location, profilePicture, bannerImage } =
-      req.body;
+    const { firstName, lastName, bio, location } = req.body;
+    const files = req.files as {
+      [fieldname: string]: Express.Multer.File[];
+    };
+
+    const updateData: any = {
+      firstName,
+      lastName,
+      bio,
+      location,
+    };
+
+    if (files?.profilePicture?.[0]) {
+      const uploadResponse = await uploadToCloudinary(
+        files.profilePicture[0],
+        "twitter_clone_profiles",
+        [{ width: 400, height: 400, crop: "fill" }],
+      );
+      updateData.profilePicture = uploadResponse.secure_url;
+    }
+
+    if (files?.bannerImage?.[0]) {
+      const uploadResponse = await uploadToCloudinary(
+        files.bannerImage[0],
+        "twitter_clone_banners",
+        [{ width: 1200, height: 400, crop: "fill" }],
+      );
+      updateData.bannerImage = uploadResponse.secure_url;
+    }
 
     const updatedUser = await User.findOneAndUpdate(
       { clerkId: userId },
-      {
-        $set: {
-          firstName,
-          lastName,
-          bio,
-          location,
-          profilePicture,
-          bannerImage,
-        },
-      },
+      { $set: updateData },
       {
         new: true,
         runValidators: true,
@@ -66,38 +87,9 @@ export const updateProfile = asyncHandler(
 
 /**
  * @desc    Sync Clerk User with MongoDB (Idempotent)
+ * @route   POST /api/users/sync
+ * @access  Private
  */
-// export const syncUser = asyncHandler(async (req: Request, res: Response) => {
-//   const { userId } = getAuth(req);
-//   if (!userId) {
-//     res.status(401);
-//     throw new Error("Unauthorized");
-//   }
-//   let user = await User.findOne({ clerkId: userId });
-
-//   if (user) {
-//     res.status(200).json({ user, message: "User already synced" });
-//     return;
-//   }
-//   const clerkUser = await clerkClient.users.getUser(userId);
-//   const primaryEmail =
-//     clerkUser.emailAddresses[0]?.emailAddress ??
-//     `user_${Math.floor(Math.random() * 1000)}`;
-
-//   const userData: Partial<IUser> = {
-//     clerkId: userId,
-//     email: primaryEmail,
-//     firstName: clerkUser.firstName ?? "",
-//     lastName: clerkUser.lastName ?? "",
-//     username:
-//       clerkUser.username ?? primaryEmail.split("@")[0] ?? uniqueNameGenrator(),
-//     profilePicture: clerkUser.imageUrl ?? "",
-//   };
-//   user = await User.create(userData);
-
-//   res.status(201).json({ user, message: "User created successfully" });
-// });
-
 export const syncUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   if (!userId) {
@@ -113,7 +105,6 @@ export const syncUser = asyncHandler(async (req: Request, res: Response) => {
       return;
     }
 
-    // This line is likely where the 500 crash happens
     const clerkUser = await clerkClient.users.getUser(userId);
 
     const primaryEmail =
@@ -134,7 +125,6 @@ export const syncUser = asyncHandler(async (req: Request, res: Response) => {
     user = await User.create(userData);
     res.status(201).json({ user, message: "User created successfully" });
   } catch (error: any) {
-    // This will print the REAL error in your backend terminal
     console.error("SYNC ERROR:", error.message);
     res
       .status(500)
@@ -143,8 +133,9 @@ export const syncUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 /**
- * @desc    Get current authenticated user
+ * @desc    Get current authenticated user profile
  * @route   GET /api/users/me
+ * @access  Private
  */
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
@@ -168,6 +159,8 @@ export const getCurrentUser = asyncHandler(
 
 /**
  * @desc    Follow/Unfollow User (Atomic Transaction)
+ * @route   POST /api/users/follow/:targetUserId
+ * @access  Private
  */
 export const followUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId: clerkId } = getAuth(req);
@@ -193,8 +186,8 @@ export const followUser = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("You cannot follow yourself");
   }
 
-  const isFollowing = currentUser.following.includes(
-    new mongoose.Types.ObjectId(targetUserId),
+  const isFollowing = currentUser.following.some(
+    (id: any) => id.toString() === targetUserId,
   );
   const session = await mongoose.startSession();
   session.startTransaction();

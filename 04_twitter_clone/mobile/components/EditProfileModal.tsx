@@ -9,6 +9,7 @@ import {
   TextInput,
   Image,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface EditProfileModalProps {
   isVisible: boolean;
@@ -46,9 +47,17 @@ const EditProfileModal = ({
     saveProfile();
   };
 
+  const inset = useSafeAreaInsets();
   return (
-    <Modal visible={isVisible} animationType="slide" presentationStyle="pageSheet">
-      <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100">
+    <Modal
+      visible={isVisible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
+      <View
+        style={{ paddingTop: inset.top > 0 ? inset.top : 20 }}
+        className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100"
+      >
         <TouchableOpacity onPress={onClose}>
           <Text className="text-blue-500 text-lg">Cancel</Text>
         </TouchableOpacity>
@@ -73,7 +82,10 @@ const EditProfileModal = ({
         <View className="relative">
           <Image
             source={{
-              uri: bannerImage || currentBannerImage || "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop",
+              uri:
+                bannerImage ||
+                currentBannerImage ||
+                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop",
             }}
             className="w-full h-40"
           />

@@ -1,50 +1,53 @@
-# Welcome to your Expo app 👋
+# Recipe App (Mobile)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The frontend mobile application for the Recipe App, built with **React Native** and **Expo**. This project integrates a third-party culinary database with a custom PostgreSQL-backed favorites system, focusing on a premium UI/UX and secure user onboarding.
 
-## Get started
+## 🚀 Key Features
 
-1. Install dependencies
+* **Full Auth Flow:** Custom-styled Email/Password authentication and verification via **Clerk**.
+* **Live Recipe Search:** Real-time recipe discovery powered by **TheMealDB API**.
+* **Relational Favorites:** Persistent storage for favorite recipes using a custom **PostgreSQL (Drizzle)** backend.
+* **Dynamic Routing:** Deep-linking and parameter-based routing for specific recipe details using **Expo Router**.
 
-   ```bash
-   npm install
-   ```
 
-2. Start the app
+## 🛠 Tech Stack
 
-   ```bash
-   npx expo start
-   ```
+* **Framework:** Expo (SDK 54) / TypeScript
+* **Navigation:** Expo Router (File-based)
+* **Authentication:** @clerk/clerk-expo
+* **API Handling:** Fetch API with service-layer transformation
+* **Icons:** Ionicons via `@expo/vector-icons`
+* **Storage:** Expo Secure Store
 
-In the output, you'll find options to open the app in a
+## 📂 Navigation Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* `(auth)`: Onboarding, Sign-In, Sign-Up, and Email Verification.
+* `(tabs)/index`: Featured recipes and category filtering.
+* `(tabs)/search`: Global recipe search.
+* `(tabs)/favorites`: User-specific saved recipes (Synced with PostgreSQL).
+* `recipe/[id]`: Detailed view including ingredients, instructions, and YouTube links.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## ⚙️ Development & Build
 
-## Get a fresh project
+### Local Setup
 
-When you're ready, run:
+1. **Install:** `npm install`
+2. **Env:** Set `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` in your `.env`.
+3. **Configure:** Update `Config.ts` with your local IP or backend URL.
+4. **Run:** `npx expo start`
+
+### Production Build (EAS)
+
+This project is configured for **Expo Application Services (EAS)**:
 
 ```bash
-npm run reset-project
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login to Expo
+eas login
+
+# Build for Android (APK)
+eas build --platform android --profile preview
+
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

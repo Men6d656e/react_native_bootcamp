@@ -2,7 +2,7 @@ import app from "./app.js";
 import config from "./config/env.js";
 import job from "./config/cron.js";
 
-const PORT = config.PORT || 5001;
+const PORT = config.PORT || 5000;
 
 /**
  * Start the keep-alive cron job if in production.

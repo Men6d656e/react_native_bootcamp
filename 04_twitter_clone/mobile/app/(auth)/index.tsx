@@ -1,6 +1,4 @@
 import { useSocialAuth } from "@/hook/useSocialAuth";
-import { Link } from "expo-router";
-import { useState } from "react";
 import {
   ActivityIndicator,
   Image,

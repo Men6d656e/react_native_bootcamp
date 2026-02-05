@@ -16,32 +16,36 @@ SplashScreen.preventAutoHideAsync();
  */
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    "SpaceMono": require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
+    if (error) console.error("Font Load Error:", error);
+
     if (loaded || error) {
-      SplashScreen.hideAsync();
+      // Small delay ensures the UI is ready to paint
+      setTimeout(async () => {
+        await SplashScreen.hideAsync();
+      }, 100);
     }
   }, [loaded, error]);
 
   const publishableKey = Config.CLERK_PUBLISHABLE_KEY;
 
-  if (!publishableKey) {
-    console.warn("Clerk Publishable Key is missing! Check Config.ts");
-  }
-
+  // If fonts aren't ready, we MUST return something or wait.
+  // Returning null while the splash screen is locked is correct,
+  // but we must ensure hideAsync() is eventually called.
   if (!loaded && !error) {
     return null;
   }
-
+  console.log("Clerk Key:", publishableKey ? "FOUND" : "MISSING");
   return (
-    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <ClerkLoaded>
-        <SafeScreen>
-          <Slot />
-        </SafeScreen>
-      </ClerkLoaded>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey!}>
+      {/* <ClerkLoaded> */}
+      <SafeScreen>
+        <Slot />
+      </SafeScreen>
+      {/* </ClerkLoaded> */}
     </ClerkProvider>
   );
 }

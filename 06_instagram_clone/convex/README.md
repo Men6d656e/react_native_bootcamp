@@ -1,90 +1,52 @@
-# Welcome to your Convex functions directory!
+# Instagram Clone (Backend - Convex)
 
-Write your Convex functions here.
-See https://docs.convex.dev/functions for more.
+The real-time serverless engine for the Instagram Clone. Built with **Convex**, this backend handles real-time data synchronization, multi-table relational queries, and automated cloud file storage for media.
 
-A query function that takes two arguments looks like:
+## 🛠 Tech Stack
 
-```ts
-// functions.js
-import { query } from "./_generated/server";
-import { v } from "convex/values";
+* **Backend Platform:** [Convex](https://www.convex.dev/) (Serverless)
+* **Authentication:** **Clerk** (Integrated via Webhooks & JWT)
+* **Language:** TypeScript
+* **Security:** Svix (Webhook verification)
+* **File Storage:** Convex HTTP Actions & Storage API
 
-export const myQueryFunction = query({
-  // Validators for arguments.
-  args: {
-    first: v.number(),
-    second: v.string(),
-  },
+## 🚀 Key Features
 
-  // Function implementation.
-  handler: async (ctx, args) => {
-    // Read the database as many times as you need here.
-    // See https://docs.convex.dev/database/reading-data.
-    const documents = await ctx.db.query("tablename").collect();
+* **Real-time Sync:** Automatic UI updates for likes, comments, and follower counts without manual polling.
+* **Complex Schema:** Relational data modeling for Users, Posts, Likes, Comments, Follows, Notifications, and Bookmarks.
+* **Clerk Webhook Integration:** Automated user provisioning in the Convex database upon Clerk sign-up via `http.ts`.
+* **Cloud File Management:** Direct-to-cloud image uploads and automated cleanup of storage objects upon post deletion.
+* **Notification System:** Event-driven notification triggers for social interactions (likes, comments, follows).
+* **Advanced Indexing:** High-performance queries using specialized indices (e.g., `by_user_and_post`, `by_follower`).
 
-    // Arguments passed from the client are properties of the args object.
-    console.log(args.first, args.second);
+## 📂 Backend Structure (Convex/)
 
-    // Write arbitrary JavaScript here: filter, aggregate, build derived data,
-    // remove non-public properties, or create new objects.
-    return documents;
-  },
-});
+```text
+convex/
+├── schema.ts          # Relational database definitions & indices
+├── users.ts           # User profiles, follow logic, and auth helpers
+├── posts.ts           # Post CRUD, like/unlike, and storage handling
+├── comments.ts        # Nested commenting logic and post counters
+├── notifications.ts   # Social activity stream queries
+├── bookmarks.ts       # Save/Archive post functionality
+├── http.ts            # Clerk Webhook receiver & HTTP actions
+└── _generated/        # Type-safe client and server helpers
+
 ```
 
-Using this query function in a React component looks like:
+## ⚙️ Development & Deployment
 
-```ts
-const data = useQuery(api.functions.myQueryFunction, {
-  first: 10,
-  second: "hello",
-});
-```
+### Local Development
 
-A mutation function looks like:
+1. **Install Convex CLI:** `npm install -g convex`
+2. **Setup:** Run `npx convex dev` to sync your schema and functions to the cloud.
+3. **Environment Variables:** Set your `CLERK_WEBHOOK_SECRET` in the Convex Dashboard.
 
-```ts
-// functions.js
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+### Key Scripts
 
-export const myMutationFunction = mutation({
-  // Validators for arguments.
-  args: {
-    first: v.string(),
-    second: v.string(),
-  },
+* `npx convex dev`: Starts a development server with real-time schema syncing.
+* `npx convex dashboard`: Opens the data browser to inspect tables and storage.
 
-  // Function implementation.
-  handler: async (ctx, args) => {
-    // Insert or modify documents in the database here.
-    // Mutations can also read from the database like queries.
-    // See https://docs.convex.dev/database/writing-data.
-    const message = { body: args.first, author: args.second };
-    const id = await ctx.db.insert("messages", message);
+---
 
-    // Optionally, return a value from your mutation.
-    return await ctx.db.get(id);
-  },
-});
-```
-
-Using this mutation function in a React component looks like:
-
-```ts
-const mutation = useMutation(api.functions.myMutationFunction);
-function handleButtonPress() {
-  // fire and forget, the most common way to use mutations
-  mutation({ first: "Hello!", second: "me" });
-  // OR
-  // use the result once the mutation has completed
-  mutation({ first: "Hello!", second: "me" }).then((result) =>
-    console.log(result),
-  );
-}
-```
-
-Use the Convex CLI to push your functions to a deployment. See everything
-the Convex CLI can do by running `npx convex -h` in your project root
-directory. To learn more, launch the docs with `npx convex docs`.
+**Next Step:** Since Project #06 uses a serverless approach, would you like me to generate the **Root README** or the **LinkedIn post** to highlight your new expertise in **Real-time Serverless Architectures**?

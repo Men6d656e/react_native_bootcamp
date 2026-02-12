@@ -1,3 +1,4 @@
+import * as Linking from "expo-linking";
 import { COLORS } from "@/constants/theme";
 import { styles } from "@/styles/auth.styles";
 import { useSSO } from "@clerk/clerk-expo";
@@ -7,17 +8,19 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function login() {
   const { startSSOFlow } = useSSO();
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleGoogleSignIn = async () => {
     try {
+      const redirectUrl = Linking.createURL("/", { scheme: "com.akash.insta" });
       const { createdSessionId, setActive } = await startSSOFlow({
         strategy: "oauth_google",
+        redirectUrl,
       });
 
       if (setActive && createdSessionId) {
-        setActive({ session: createdSessionId });
-        router.replace("/(tabs)");
+        await setActive({ session: createdSessionId });
+        // router.replace("/(tabs)");
       }
     } catch (error) {
       console.error("OAuth error:", error);

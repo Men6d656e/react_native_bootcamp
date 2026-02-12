@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# Instagram Clone (Real-Time Full Stack)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is **Project #06** of my React Native Bootcamp. This application represents the pinnacle of the series, moving away from traditional REST APIs to a **Real-Time Serverless Architecture**. It features instant UI updates, live notifications, and reactive data streams.
 
-## Get started
+## 📁 Project Structure
 
-1. Install dependencies
+The project is built as a unified monorepo:
 
-   ```bash
-   npm install
-   ```
+* **`app/`**: The React Native (Expo) frontend, optimized for high-performance media rendering and reactive data subscriptions.
+* **`convex/`**: The serverless backend engine. It contains the database schema, real-time mutations, and cloud storage logic.
+* *For a deep dive into the backend logic, please refer to the [Convex README](https://www.google.com/search?q=./convex/README.md).*
 
-2. Start the app
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+## 🚀 Key Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* **Reactive UI:** Instant updates for likes, comments, and follows—no manual refreshing required.
+* **Media Engine:** Direct-to-storage image uploads and processing.
+* **Social Graph:** Comprehensive follow/unfollow system with user-specific feeds.
+* **Discovery:** Advanced profile views and bookmarked posts.
+* **Live Notifications:** Real-time activity stream for social interactions.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠 Setup & Own Deployment
 
-## Get a fresh project
+To use this code with your own resources, follow these steps:
 
-When you're ready, run:
+### 1. Backend (Convex)
 
-```bash
-npm run reset-project
+* Sign up at [Convex.dev](https://www.google.com/search?q=https://www.convex.dev).
+* Run `npx convex dev` in the root folder to deploy the schema and functions.
+* In your Convex Dashboard, add your `CLERK_WEBHOOK_SECRET`.
+
+### 2. Authentication (Clerk)
+
+* Create a project at [Clerk.com](https://www.google.com/search?q=https://clerk.com).
+* Configure the JWT template for Convex.
+* Set up a Webhook pointing to your Convex deployment URL (ending in `/clerk-webhook`).
+
+### 3. Environment Variables
+
+Create a `.env` file in the root with your credentials:
+
+```env
+CONVEX_DEPLOYMENT=your_deployment_name
+EXPO_PUBLIC_CONVEX_URL=your_convex_url
+EXPO_PUBLIC_CONVEX_SITE_URL=your_convex_site_url
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
+EXPO_PUBLIC_CLERK_JWT_ISSUER_DOMAIN=your_clerk_issuer_url
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 4. Build (EAS)
 
-## Learn more
+To generate your own APK:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm install -g eas-cli
+eas build --platform android --profile preview
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
 
-## Join the community
+## 📦 Mobile Build & Demo
 
-Join our community of developers creating universal apps.
+A stable build is available in the **Releases** section for immediate testing.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+> **Maintenance Period:** The demo backend and Clerk services for the release build will be terminated after **3 months**. To continue using or testing the app after this period, you **must** follow the setup instructions above to deploy the infrastructure using your own Convex and Clerk accounts.
